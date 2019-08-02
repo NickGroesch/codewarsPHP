@@ -32,16 +32,22 @@ function findOpener(string $formula, int $index){
 
 function findCloser(string $formula, int $index, string $opener){
     $pairs=[
-        "("=>"\)",
-        "{"=>"\}",
-        "["=>"\]"
+        "("=>")",
+        "{"=>"}",
+        "["=>"]"
     ];
+    echo "$formula\n";
     echo "findCloser $opener \n";
-    $regex= '\'/' . $pairs[$opener] . '/\'';
-    echo "$regex \n";
-    if (preg_match($regex, $formula, $matches, PREG_OFFSET_CAPTURE, $offset=$index)){
-        $inhere= $matches[0][1];
-        echo "$inhere \n";
-        return $inhere;
+    $search= $pairs[$opener];
+    echo "looking for $search\n";
+    $openCount=0;
+    $index+=1;
+    while($openCount>-1){
+        if($openCount==0&&$search==$formula[$index]){return $index;}
+        if($openCount>0&&$search==$formula[$index]){$openCount--;}
+        if($formula[$index]==$opener){$openCount++;}
+        if($index>strlen($formula)){return "WTF";}
+        echo "char $formula[$index] index $index openCount $openCount\n";
+        $index++;
     }
 }
