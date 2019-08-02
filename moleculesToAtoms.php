@@ -8,21 +8,28 @@ function parse_molecule(string $formula): array {
     $index=0;
     $opener=0;
     while($unparsed){
-        echo "index $index\n";
-        if($atoms){prettyArray($atoms);}
-        if(ctype_upper($formula[$index])){
-            echo "might be an atom\n";
-            if(ctype_upper($formula[$index+1])){
-                if($atoms[$formula[$index]]){$atoms[$formula[$index]]++;}else{$atoms+=[$formula[$index]=>1];}
-                // $atoms[$formula[$index]]?$atoms[$formula[$index]]++:$atoms+=[$formula[$index]=>1];
-                echo "so it is\n";
-            }else if(ctype_lower($formula[$index+1])){
-
-                $double= $formula[$index]; // $formula[$index+1];
-                $double.= $formula[$index+1];
-                if($atoms[$double]){$atoms[$double]++;}else{$atoms+=[$double=>1];}
+        $local = $formula[$index];
+        $next = $formula[$index+1];
+        $theFollowing = $formula[$index+2];
+        echo "index $index $local\n";
+        if(ctype_upper($local)){//its upper
+            if(ctype_upper($next)||$index+1>=strlen($formula)){//next is upper
+                if($atoms[$local]){$atoms[$local]++;}else{$atoms+=[$local=>1];}
+            }else if(ctype_lower($next)){//next is lower
+                $double= $local . $next; 
+                $index++;
+                if(ctype_digit($theFollowing)){//following is digit
+                    $mult= intval($theFollowing);
+                    if($atoms[$double]){$atoms[$double]+=$mult;}else{$atoms+=[$double=>$mult];}
+                    $index++;
+                } else if($atoms[$double]){$atoms[$double]++;}else{$atoms+=[$double=>1];}//following is not digit
+            }else if(ctype_digit($next)){//next is digit
+                $mult= intval($next);
+                if($atoms[$local]){$atoms[$local]+=$mult;}else{$atoms+=[$local=>$mult];}
+                $index++;
             }
         }
+        if($atoms){prettyArray($atoms);}
         // if (findOpener($formula, $index)){
         //     $opener= findOpener($formula, $index);
         //     $index= $opener;
@@ -34,18 +41,14 @@ function parse_molecule(string $formula): array {
         $unparsed= $index>strlen($formula) ? false : true;
         $index++;
     }
+    echo "the final answer is:\n";
     return $atoms;
 }
-parse_molecule("HXHHXXHHHHXXXHxHxHx(HHHHHHHHH{HO}2)3HH");//impossible molecule, but helpful test case;
+// parse_molecule("HXHHXXHHHHXXXHxHxHx(HHHHHHHHH{HO}2)3HH");//impossible molecule, but helpful test case;
+// prettyArray(parse_molecule("HOH"));
+// prettyArray(parse_molecule("H2O"));
+prettyArray(parse_molecule("Hx2O"));
 
-// function findOpener(string $formula, int $index){
-//     if (preg_match('/[\[{\(]/', $formula, $matches, PREG_OFFSET_CAPTURE, $offset=$index)){
-//         $opener= $matches[0][1];
-//         $index= $opener;
-//         return $opener;
-//     }else{
-//         return false;}
-// }
 
 function findCloser(string $formula, int $index, string $opener){
     $pairs=[
@@ -68,8 +71,16 @@ function findCloser(string $formula, int $index, string $opener){
         $index++;
     }
 }
+                                                                                    // function findOpener(string $formula, int $index){
+                                                                                    //     if (preg_match('/[\[{\(]/', $formula, $matches, PREG_OFFSET_CAPTURE, $offset=$index)){
+                                                                                    //         $opener= $matches[0][1];
+                                                                                    //         $index= $opener;
+                                                                                    //         return $opener;
+                                                                                    //     }else{
+                                                                                    //         return false;}
+                                                                                    // }
 function prettyArray(array $ugly){
     foreach($ugly as $key=>$value) {
-        echo "$key=>$value\n";
+        echo "            $key=>$value\n";
     }
 }
