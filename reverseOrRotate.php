@@ -12,16 +12,20 @@ function revRot($str, $sz) {
         return "";
     }
     $chunks= str_split($str, $sz);
+    if(strlen($chunks[count($chunks)-1])<$sz){array_pop($chunks);}
     $processed=[];
     foreach($chunks as $chunk){
-        if(testChunk($chunk)){
-           array_push($processed, strrev($chunk)); // reverse string
-        }else{
-            // rotate string
+        if(testChunk($chunk)){// reverse string
+            array_push($processed, strrev($chunk)); 
+        }else{// rotate string
+            $local= str_split($chunk);
+            $rotate=array_shift($local);
+            array_push($local, $rotate);
+            array_push($processed, implode("", $local));
         }
     }
-    prettyArray($processed);
-    return $chunks;
+    // prettyArray($processed);
+    return implode("",$processed);
 }
 function sum($carry, $new){
     return $carry+=$new;
@@ -30,18 +34,9 @@ function sum($carry, $new){
 function testChunk($chunk){
     // because any integer exponentiation of an integer preserves its parity
     $array= str_split($chunk);
-    echo $array;
+    // echo $array;
     $sum = array_reduce($array, "sum");
-
-    // $digits= str_split($chunk);
-
-    // $sum=0;
-    // foreach($digits as $digit){
-
-    //     $num= intval($digit);
-    //     // $sum+=$num**3;
-    // }
-    echo "$chunk:$sum\n";
+    // echo "$chunk:$sum\n";
     // return value of true indicates reverse chunk
     if($sum%2==0){return true;}else{return false;}
 }
@@ -52,4 +47,5 @@ function prettyArray(array $ugly){
     }
 }
 
-prettyArray(revRot("733049910872815764", 4));
+// prettyArray(revRot("733049910872815764", 4));
+echo (revRot("733049910872815764", 4));
