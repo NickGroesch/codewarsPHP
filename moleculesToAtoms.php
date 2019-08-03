@@ -13,7 +13,7 @@ function parse_molecule(string $formula): array {
         $theFollowing = $formula[$index+2];
         echo "index $index $local\n";
         if(ctype_upper($local)){//its upper
-            if(ctype_upper($next)||$index+1>=strlen($formula)){//next is upper
+            if(ctype_upper($next)||$index+1>=strlen($formula)||ctype_punct($next)){//next is upper, end, or nested
                 if($atoms[$local]){$atoms[$local]++;}else{$atoms+=[$local=>1];}
             }else if(ctype_lower($next)){//next is lower
                 $double= $local . $next; 
@@ -28,6 +28,16 @@ function parse_molecule(string $formula): array {
                 if($atoms[$local]){$atoms[$local]+=$mult;}else{$atoms+=[$local=>$mult];}
                 $index++;
             }
+        }else if(ctype_punct($local)){
+            // this is where we do the recursions
+            $closer=findCloser($formula, $index, $local);
+            $multiplier= $formula[$closer+1];
+            $compound=substr($formula, $index+1, $closer-1);
+            $addAtoms=parse_molecule($compound);
+            foreach($addAtoms as $element=>$number){
+                if($atoms[$element]){$atoms[$element]+=$number*$multiplier;}else{$atoms+=[$element=>$number*$multiplier];}
+            }
+            $index= $closer+1 ;//only works for 1 digit multipliers
         }
         if($atoms){prettyArray($atoms);}
         // if (findOpener($formula, $index)){
@@ -45,9 +55,11 @@ function parse_molecule(string $formula): array {
     return $atoms;
 }
 // parse_molecule("HXHHXXHHHHXXXHxHxHx(HHHHHHHHH{HO}2)3HH");//impossible molecule, but helpful test case;
-// prettyArray(parse_molecule("HOH"));
-// prettyArray(parse_molecule("H2O"));
-prettyArray(parse_molecule("Hx2O"));
+// prettyArray(parse_molecule("HOH"));//gtg
+// prettyArray(parse_molecule("H2O"));//gtg
+// prettyArray(parse_molecule("Hx2O"));//gtg
+// prettyArray(parse_molecule("P(H{NP[OH]2}3)4"));//
+prettyArray(parse_molecule("P[OH]2"));//
 
 
 function findCloser(string $formula, int $index, string $opener){
