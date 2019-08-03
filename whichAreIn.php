@@ -5,7 +5,8 @@ function inArray($array1, $array2):array {
    foreach($array1 as $regex){
         foreach($array2 as $word){
             $regstr= strval($regex);
-            if(strpos($word, $regstr)){
+            echo $regstr, "\n";
+            if(strpos(($word), $regstr)){
                 array_push($result, $regstr);
                 break;
             }
@@ -15,11 +16,12 @@ function inArray($array1, $array2):array {
    return $result;
 }
 
-function prettyArray(array $ugly){
+function prettyArray(array $ugly , $name="PRETTY_ARRAY"){
+    echo "$name\n";
     foreach($ugly as $word) {
         echo $word, "\n";
     }
 }
 
 // prettyArray( inArray(['a','e','i','o','u'], ['cat', 'hat', 'hut']) );
-prettyArray( inArray(["arp", "live", "strong"],  ["lively", "alive", "harp", "sharp", "armstrong"]) );
+prettyArray( inArray(["arp", "live", "strong", "1"],  ["lively", "alive", "harp", "sharp", "armstrong", "1.9"]) );
