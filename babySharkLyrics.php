@@ -10,8 +10,8 @@ function babySharkLyrics() {
             $a.=$p.$s;
         }
     }
-    $e='\u2026';
-    return $a.="Run away,$e";
+    // $e='\u2026';
+    return $a.="Run away,…";
 }
 // echo(babySharkLyrics());
 
